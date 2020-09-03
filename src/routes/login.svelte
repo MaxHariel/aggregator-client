@@ -9,7 +9,7 @@
 
   let loading = false;
 
-  async function login() {
+  const login = async () => {
     let valid = true;
     errors.auth = "";
     if (fields.email.trim().length < 1) {
@@ -29,7 +29,7 @@
     loading = true;
     if (valid) {
       console.log("oi");
-      const response = fetch("/login", {
+      const response = await fetch("/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -47,7 +47,7 @@
       }
       loading = false;
     }
-  }
+  };
 </script>
 
 <style>

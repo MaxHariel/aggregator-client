@@ -1,10 +1,8 @@
 import fetch from "node-fetch";
-import { json } from "body-parser";
-
 const headers = {
     "Content-Type": "application/json",
     Accept: "application/json"
-},
+}
 
 export async function post(req, res) {
     try {

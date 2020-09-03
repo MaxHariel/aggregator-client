@@ -1,6 +1,22 @@
 <script context="module">
   export async function preload(page, session) {
-    console.log(session);
+    const { token } = session.token;
+    if (!token) this.redirect(302, "login");
+    console.log("token", token);
+    const response = await this.fetch(`http://127.0.0.1:3333/subjects`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      mode: "cors",
+      cache: "default"
+    });
+    const parsed = await response.json();
+    if (parsed.error) return this.error(response.status, parsed.error);
+    console.log(parsed);
+    return { subjects: parsed };
   }
 </script>
 
@@ -10,21 +26,9 @@
   const { session } = stores();
   import "bulma/css/bulma.css";
 
-  let subjects = [];
+  export let subjects;
 
   let loggin = false;
-
-  onMount(async () => {
-    const res = await fetch(`http://127.0.0.1:3333/subjects`, {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("jwt")
-      },
-      mode: "cors",
-      cache: "default"
-    });
-    subjects = await res.json();
-  });
 </script>
 
 <style>

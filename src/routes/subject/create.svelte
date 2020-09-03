@@ -1,11 +1,18 @@
+<script context="module">
+  export async function preload(page, session) {
+    const { token } = session.token;
+    console.log("token", token);
+    return { token };
+  }
+</script>
+
 <script>
   import { onMount } from "svelte";
   import { goto } from "@sapper/app";
 
   let subject = "";
   let description = "";
-
-  let data = new FormData();
+  export let token;
 
   onMount(() => {
     const fileInput = document.querySelector("#file input[type=file]");
@@ -13,35 +20,25 @@
       if (fileInput.files.length > 0) {
         const fileName = document.querySelector("#file .file-name");
         fileName.textContent = fileInput.files[0].name;
-        data.append("file", fileInput.files[0]);
       }
     };
   });
 
-  function handleSubmit() {
-    data.append("subject", subject);
-    data.append("description", description);
-    console.log("JWT ",sessionStorage.getItem('jwt'))
-    fetch("http://127.0.0.1:3333/subjects", {
+  const handleSubmit = async e => {
+    const formData = new FormData(event.target);
+    let data = new FormData();
+    for (const [k, v] of formData.entries()) {
+      data.append(`${k}`, v);
+    }
+
+    const reponse = fetch("http://127.0.0.1:3333/subjects", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + sessionStorage.getItem('jwt')
+        Authorization: `Bearer ${token}`
       },
       body: data
-    })
-      .then(response => response.json())
-      .then(data => {
-        if(data.status) { 
-          goto("/home") 
-        } else {
-
-        }  
-      })
-      .catch(error => {
-        
-        console.error("Error:", error);
-      });
-  }
+    });
+  };
 </script>
 
 <style>
@@ -64,11 +61,12 @@
       </header>
       <div class="card-content">
         <div class="content">
-          <form>
+          <form action="#" on:submit|preventDefault={handleSubmit}>
             <div class="field">
               <label class="label">Assunto</label>
               <div class="control">
                 <input
+                  name="subject"
                   bind:value={subject}
                   class="input"
                   type="text"
@@ -80,6 +78,7 @@
               <label class="label">Descrição</label>
               <div class="control">
                 <textarea
+                  name="description"
                   bind:value={description}
                   class="textarea"
                   placeholder=""
@@ -90,7 +89,7 @@
             </div>
             <div id="file" class="file has-name">
               <label class="file-label">
-                <input class="file-input" type="file" name="resume" required/>
+                <input class="file-input" type="file" name="file" required />
                 <span class="file-cta">
                   <span class="file-icon">
                     <i class="fas fa-upload" />
@@ -102,12 +101,7 @@
             </div>
             <div class="field">
               <div class="control">
-                <button
-                  on:click|preventDefault={handleSubmit}
-                  type="submit"
-                  class="button is-link">
-                  Criar
-                </button>
+                <button type="submit" class="button is-link">Criar</button>
               </div>
             </div>
           </form>

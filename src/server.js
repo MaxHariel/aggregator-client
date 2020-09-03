@@ -16,7 +16,7 @@ const dev = NODE_ENV === 'development';
 polka()
 	.use(bodyParser.json())
 	.use(session({
-		secret: 'skdsa-com',
+		secret: 'conduit',
 		resave: true,
 		saveUninitialized: true,
 		cookie: {
@@ -31,7 +31,7 @@ polka()
 		sirv('static', { dev }),
 		sapper.middleware({
 			session: req => ({
-				token: req.session && req.session.token,
+				token: req.session.token,
 			})
 		})
 	)

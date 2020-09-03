@@ -26,7 +26,7 @@
     }
 
     if (valid) {
-      fetch("http://127.0.0.1:3333/register", {
+      fetch("/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
